@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/ClientSide/html.html to edit this template
+-->
+<html>
+    <head>
+        <title>Show</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+          <script src="https://login2explore.com/jpdb/resources/js/0.0.3/jpdb-commons.js"></script>
+    </head>
+    <body> 
+    <div class="container">
+        <h2>Find Data using unique Email-ID</h2>
+    <div class="form-group">
+      <label for="email">Email:</label>
+      <input type="email" class="form-control" id="email" placeholder="Enter email" name="email" >
+    </div>
+         <button type="button" class="btn btn-primary" id="savedata" value="View Record" onclick="showDetails()">Submit</button>
+         <p id="show"></p>
+    </div>
+        <script>
+        function executeCommand(reqString, dbBaseUrl, apiEndPointUrl) {
+            var url = dbBaseUrl + apiEndPointUrl;
+            var jsonObj;
+            $.post(url, reqString, function (result) {
+                jsonObj = JSON.parse(result);
+            }).fail(function (result) {
+                var dataJsonObj = result.responseText;
+                jsonObj = JSON.parse(dataJsonObj);
+            });
+            return jsonObj;
+        }
+        
+        function createGETRequest(token, dbname, relationName, jsonObjStr) {
+    var value1 = "{\n"
+            + "\"token\" : \""
+            + token
+            + "\",\n" + "\"cmd\" : \"GET\",\n"
+            + "\"dbName\": \""
+            + dbname
+            + "\",\n"
+            + "\"rel\" : \""
+            + relationName
+            + "\",\n"
+            + "\"jsonStr\":\n"
+            + jsonObjStr
+            + "\n"
+            + "}";
+    return value1;
+}
+        
+        function showDetails(){
+            var token = "90938840|-31948833769480742|90945779";
+            var dbname = "EmployeeData";
+            var relationName = "Index";
+            var email = document.getElementById("email").value;
+            var jsonStr = {
+                empEmail : email
+            };
+            var reqString = createGETRequest(token, dbname, relationName, JSON.stringify(jsonStr));
+            
+            alert(reqString);
+            jQuery.ajaxSetup({async: false});
+            var resultObj = executeCommand(reqString,
+                    "http://api.login2explore.com:5577", "/api/irl");
+            jQuery.ajaxSetup({async: true});
+            
+            alert("Data Found");
+            
+            var data = JSON.stringify(resultObj);
+            
+            var res = data.split("\"");
+            
+            var mainContainer = document.getElementById("show");
+            
+            mainContainer.innerHTML ="<br>ID: " + res[10].replace("\\","")
+                    +"<br>Mobile No: " + res[6].replace("\\", "")
+                    +"<br>Email Id: " + res[18].replace("\\", "");
+        }
+    </script>
+    </body>
+</html>
